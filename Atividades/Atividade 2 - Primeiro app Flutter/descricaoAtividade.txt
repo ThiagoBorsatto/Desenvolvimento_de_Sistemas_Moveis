@@ -1,0 +1,18 @@
+Contextualização: Como desenvolvedor(a) no ecossistema industrial de Jaraguá do Sul, você foi desafiado a criar um protótipo funcional que atenda a uma demanda do setor local (inspirado em clusters como WEG, Marisol ou Malwee).
+O foco é a estruturação sólida da interface e o dinamismo de estado.
+ 
+Desafio: Escolha e desenvolva uma das opções abaixo:
+
+Opção A: App de Portfólio de Serviços Técnicos (Apresentação profissional e catálogo de competências).
+Opção B: Cardápio Digital / Catálogo de Produtos (Focado em comércio local ou suprimentos industriais).
+Opção C: Algo de seu interesse, desde que atenda aos requisitos.
+
+Requisitos Técnicos Obrigatórios:
+Estrutura: Implementação de 2 telas distintas (ex: Home e Detalhes).
+Navegação: Implementação funcional da pilha com Navigator.push() e Navigator.pop().
+Raiz de Interface: Uso obrigatório de Scaffold em ambas as telas.
+Organização de Layout: Uso estrito de Row, Column e Container para estruturação visual.
+
+Dinamismo de Estado: Criar uma funcionalidade interativa (ex: seletor de quantidade, curtida ou troca de tema) utilizando obrigatoriamente um StatefulWidget e a chamada de setState().
+
+Entrega: repositório git com código funcional, contendo no readme gif funcional e explicação sobre o app.
