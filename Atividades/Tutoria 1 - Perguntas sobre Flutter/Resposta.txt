@@ -1,0 +1,55 @@
+Responda às questões abaixo com profundidade técnica, demonstrando domínio sobre a estrutura e o ciclo de vida dos componentes mobile.
+ 
+1. Arquitetura de Widgets: Explique o conceito fundamental "Everything is a Widget". Como a organização da árvore de widgets (Widget Tree) dita o comportamento de renderização e a hierarquia visual de um app?
+No Flutter todas as estruturas visuais e não visuais são widgets:
+layout (Padding, Align, Center), gestos (GestureDetector), animações (AnimatedContainer), e até mesmo a própria estrutura do app (MaterialApp, Scaffold) são widgets. Ou seja, não é só "o que aparece na tela", é a unidade fundamental de configuração da interface como um todo incluindo comportamento, estilo e estrutura.
+Àrvore de configuração. Um widget no Flutter é, na verdade, uma descrição imutável de uma parte da interface em um dado momento. Quando o estado muda, o Flutter não "modifica" o widget é reconstrói.
+Tecnicamente, existem três árvores paralelas:
+Widget Tree: a árvore imutável de configuração.
+Element Tree: a árvore "viva", mutável, que mantém o ciclo de vida e faz a ponte entre o widget.
+RenderObject Tree: a árvore responsável pelo layout, pintura (paint) e hit-testing (toque) de fato na tela.
+No Flutter, o fluxo de layout é: os pais passam constraints (restrições de tamanho) para os filhos, e os filhos respondem com seu tamanho de volta para o pai.
+
+2. Scaffold: Descreva a função do widget Scaffold como implementador da estrutura visual do Material Design. Detalhe a importância dos slots appBar, body e floatingActionButton na construção de interfaces padronizadas.
+appBar: normalmente é o menu superior da aplicação usado para manter funções de acesso a nova tela, pesquisa, retorno ao menu principal, entre outro elementos importantes para poder navegar na aplicação.
+body: é o espaço total que a aplicação pode trabalhar, onde é mostrado o contéudo principal da aplicaçãom dentro dela tem diversos outros widget com suas funcões determinadas.
+floatingActionButton: é o botão flutuante que por padrão é colocado no canto inferiror direito da tela por cima do body, ele é usando para execultar alguma função determinada dentro da aplicação.
+
+3. Stateless vs. StatefulWidget: Diferencie tecnicamente os dois tipos de widgets. Explique como a persistência (ou ausência dela) de dados de estado impacta o ciclo de vida do componente e a performance da aplicação.
+Stateless: Um widget estático que não possui modificação no uso da aplicação uma fez que ele for construido não pode ser alterado, no caso não precisa ser alterado depois que for renderizado. Normalmente usado para texto.
+StatefulWidget: Já widget que precisa ser alterados ou modificados durante a execução da aplicação, ou seja sempre que precisar o mesmo vai ser construido novamente para atender a mudança, como valores de campos, animações, vídeos e entre outros.
+
+Quando existem muitos StatefulWidget a aplicação vai precisar de mais recursos para poder funcionar, o FrameWork é bem otimizado para construir o elemento que precisa ser alterado apenas na widgetree da mudança.
+
+4. Gerenciamento de Estado Básico: Descreva o funcionamento interno do método setState(). Em sua resposta, explique o conceito de "Mark as Dirty" e como este método interage com a Element Tree para disparar o método build().
+A função setState() faz duas coisas:
+Executa o código que você passou dentro dele (por exemplo, contador = contador + 1;), atualizando o valor da variável.
+Marca aquele widget como "dirty", avisa o Flutter que aquele pedaço da tela está desatualizado e precisa ser redesenhado.
+Como isso chega até o build():
+Cada widget na tela tem, por trás dele, um "elemento" (Element) que representa aquele widget de forma viva na árvore. Quando você marca como "sujo", é esse elemento que fica sinalizado. Aí o Flutter passa por toda a árvore, encontra os elementos marcados como sujos, e chama o método build().
+
+5. Layouts Unidimensionais: Compare os widgets Row e Column. Como as propriedades mainAxisAlignment e crossAxisAlignment se comportam em relação aos eixos principal e transversal em cada um deles?
+Row e Column são widgets de layout unidimensional, diferindo apenas na direção do eixo principal. 
+No Row, o eixo principal é horizontal (X) e o eixo transversal é vertical (Y); no Column, é o oposto do eixo principal vertical (Y) e transversal horizontal (X). 
+Em ambos, mainAxisAlignment distribui os filhos ao longo do eixo principal, enquanto crossAxisAlignment posiciona os filhos ao longo do eixo transversal.
+A propriedade tem o mesmo nome nos dois widgets, mas o eixo físico que ela afeta se inverte conforme o widget usado.
+
+6. O Widget Container: Analise por que o Container é considerado um widget de composição. Como ele integra propriedades de pintura (decoration), posicionamento (margin) e dimensionamento (padding) em um único elemento?
+É um container por combinar vários widgets pequenos, ele já faz essa composição por trás das câmeras e entrega tudo isso pronto em uma única propriedade de cada vez, tornando o código mais limpo e organizado.
+Como no exemplo em sala que o Matheus deu do text-align: center
+
+7. Navegação Imperativa: Discorra sobre a gestão da pilha de navegação (Route Stack). Qual a mecânica técnica envolvida nos comandos Navigator.push e Navigator.pop para a transição entre telas?
+O Navigator mantém uma pilha (LIFO) de objetos Route, cada um encapsulando a tela e sua transição.
+Navigator.push(context, route) localiza o Navigator mais próximo via context, empilha a nova rota no topo, dispara a animação de entrada e retorna um Future que será resolvido quando essa rota for removida, a tela anterior permanece viva na pilha, apenas inativa.
+Navigator.pop(context, [resultado]) remove a rota do topo, dispara a animação de saída, destrói o State daquela tela e resolve o Future do push() correspondente com o valor opcional passado, permitindo comunicação entre telas.
+
+8. Usabilidade em Mobile: Como a distribuição espacial de componentes e o uso de áreas de toque adequadas influenciam a UX (User Experience) em dispositivos móveis, considerando as limitações físicas das telas?
+No mobile, o toque é menos preciso que o mouse e a tela é menor, então é preciso: botões grandes o suficiente para o dedo, espaçamento para evitar erro, elementos importantes ao alcance do polegar, e conteúdo organizado por prioridade, tudo isso melhora a experiência e reduz frustração do usuário.
+
+9. Dart e Tipagem: De que forma a tipagem forte e estática do Dart atua como um mecanismo de segurança durante a construção de interfaces complexas, prevenindo erros em tempo de execução?
+A tipagem forte e estática do Dart faz com que os tipos de variáveis, parâmetros e retornos sejam verificados em tempo de compilação, antes mesmo do app rodar, diferente de linguagens dinamicamente tipadas, onde erros de tipo só aparecem durante a execução. 
+Isso é reforçado pelo null safety, que obriga o desenvolvedor a tratar explicitamente valores que podem ser nulos, eliminando a maior causa de crashes em tempo de execução.
+Em interfaces complexas, com múltiplas camadas de widgets passando dados entre si, isso garante que erros de tipo sejam detectados imediatamente no editor, e não apenas quando o usuário navega até aquela tela específica em produção tornando o desenvolvimento mais seguro e previsível.
+
+10. Composição vs. Herança: O Flutter privilegia a composição de widgets. Argumente como essa escolha arquitetural favorece a reusabilidade de código e a manutenção em projetos de escala industrial.
+O Flutter prefere "montar" telas juntando widgets pequenos pela composição de elementos, em vez de criar classes que herdam umas das outras. Isso deixa o código mais fácil de reaproveitar, mais fácil de entender e menos arriscado de alterar, o que é essencial em projetos grandes com muitas pessoas mexendo no mesmo código.
