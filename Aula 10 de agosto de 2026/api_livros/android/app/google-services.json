@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "358442254751",
+    "project_id": "api-livros-catalogo-ec2a7",
+    "storage_bucket": "api-livros-catalogo-ec2a7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358442254751:android:f4213944b12601ecd07daa",
+        "android_client_info": {
+          "package_name": "com.example.api_livros"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv_m4YvfFRqBkpXGjVaMG85LpVHbxLOrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
