@@ -51,8 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: GothicPalette.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -62,32 +63,30 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.auto_stories, color: GothicPalette.gold, size: 56),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'CATÁLOGO DE LIVROS',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: GothicPalette.gold,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 3,
-                      fontFamily: 'serif',
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: AppPalette.accent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(18),
                     ),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.auto_stories_rounded, color: AppPalette.accent, size: 32),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Catálogo de Livros',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Entre para acessar o acervo',
-                    style: TextStyle(
-                      color: GothicPalette.parchment.withValues(alpha: 0.7),
-                      fontStyle: FontStyle.italic,
-                    ),
+                    style: theme.textTheme.bodyMedium?.copyWith(color: AppPalette.textSecondary),
                   ),
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _emailController,
-                    style: const TextStyle(color: GothicPalette.parchment),
-                    cursorColor: GothicPalette.gold,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
@@ -106,8 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
-                    style: const TextStyle(color: GothicPalette.parchment),
-                    cursorColor: GothicPalette.gold,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _submit(),
@@ -129,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       _errorMessage!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFE0889A)),
+                      style: TextStyle(color: theme.colorScheme.error),
                     ),
                   ],
                   const SizedBox(height: 28),
@@ -137,25 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: _isSubmitting ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: GothicPalette.gold,
-                        foregroundColor: GothicPalette.background,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
                       child: _isSubmitting
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: GothicPalette.background,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text(
-                              'ENTRAR',
-                              style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.w600),
-                            ),
+                          : const Text('Entrar'),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -165,10 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         : () => Navigator.of(context).push(
                               MaterialPageRoute(builder: (_) => const RegisterScreen()),
                             ),
-                    child: const Text(
-                      'Não tem conta? Criar conta',
-                      style: TextStyle(color: GothicPalette.gold),
-                    ),
+                    child: const Text('Não tem conta? Criar conta'),
                   ),
                 ],
               ),

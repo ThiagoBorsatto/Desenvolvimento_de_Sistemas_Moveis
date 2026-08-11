@@ -1,79 +1,126 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-/// Paleta usada no estilo "dark-gothic" do cabeçalho e dos campos de busca.
-class GothicPalette {
-  const GothicPalette._();
+/// Paleta do tema escuro moderno do app: cinza-chumbo neutro (sem preto puro)
+/// com um único acento violeta para ações e destaques.
+class AppPalette {
+  const AppPalette._();
 
-  static const background = Color(0xFF0B0A0D);
-  static const surface = Color(0xFF17141A);
-  static const crimson = Color(0xFF7A1F2B);
-  static const gold = Color(0xFFC6A664);
-  static const parchment = Color(0xFFE8E1D3);
+  static const background = Color(0xFF121214);
+  static const surface = Color(0xFF1B1B1F);
+  static const surfaceElevated = Color(0xFF232329);
+  static const border = Color(0xFF2C2C33);
+  static const accent = Color(0xFF7C6FF0);
+  static const textPrimary = Color(0xFFF4F4F6);
+  static const textSecondary = Color(0xFF9A9AA6);
+  static const error = Color(0xFFEF6461);
 }
 
-final gothicAppBarTheme = AppBarTheme(
-  backgroundColor: GothicPalette.background,
-  foregroundColor: GothicPalette.gold,
-  elevation: 0,
-  centerTitle: true,
-  systemOverlayStyle: SystemUiOverlayStyle.light,
-  iconTheme: const IconThemeData(color: GothicPalette.gold),
-  titleTextStyle: const TextStyle(
-    color: GothicPalette.gold,
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 3,
-    fontFamily: 'serif',
-  ),
-);
+ThemeData buildAppTheme() {
+  final colorScheme = ColorScheme.fromSeed(
+    seedColor: AppPalette.accent,
+    brightness: Brightness.dark,
+  ).copyWith(
+    surface: AppPalette.surface,
+    onSurface: AppPalette.textPrimary,
+    surfaceContainerHighest: AppPalette.surfaceElevated,
+    onSurfaceVariant: AppPalette.textSecondary,
+    outline: AppPalette.border,
+    error: AppPalette.error,
+  );
 
-final gothicInputDecorationTheme = InputDecorationTheme(
-  filled: true,
-  fillColor: GothicPalette.surface,
-  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  hintStyle: TextStyle(
-    color: GothicPalette.parchment.withValues(alpha: 0.5),
-    fontStyle: FontStyle.italic,
-  ),
-  prefixIconColor: GothicPalette.gold,
-  suffixIconColor: GothicPalette.gold,
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(6),
-    borderSide: const BorderSide(color: GothicPalette.crimson, width: 1.2),
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(6),
-    borderSide: const BorderSide(color: GothicPalette.crimson, width: 1.2),
-  ),
-  focusedBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(6),
-    borderSide: const BorderSide(color: GothicPalette.gold, width: 1.6),
-  ),
-);
+  final textTheme = GoogleFonts.manropeTextTheme(
+    ThemeData(brightness: Brightness.dark).textTheme,
+  ).apply(bodyColor: AppPalette.textPrimary, displayColor: AppPalette.textPrimary);
 
-/// Linha ornamentada usada sob o AppBar para reforçar o estilo gótico.
-class GothicDivider extends StatelessWidget implements PreferredSizeWidget {
-  const GothicDivider({super.key});
-
-  @override
-  Size get preferredSize => const Size.fromHeight(3);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 3,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.transparent,
-            GothicPalette.gold,
-            GothicPalette.crimson,
-            GothicPalette.gold,
-            Colors.transparent,
-          ],
+  return ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: AppPalette.background,
+    colorScheme: colorScheme,
+    textTheme: textTheme,
+    splashFactory: InkSparkle.splashFactory,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppPalette.background,
+      foregroundColor: AppPalette.textPrimary,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: false,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+      titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+      iconTheme: const IconThemeData(color: AppPalette.textPrimary),
+    ),
+    cardTheme: CardThemeData(
+      color: AppPalette.surface,
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: const BorderSide(color: AppPalette.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: AppPalette.surface,
+      selectedColor: AppPalette.accent,
+      side: const BorderSide(color: AppPalette.border),
+      labelStyle: textTheme.labelLarge?.copyWith(color: AppPalette.textPrimary),
+      secondaryLabelStyle: textTheme.labelLarge?.copyWith(color: Colors.white),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      showCheckmark: false,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppPalette.surface,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      hintStyle: TextStyle(color: AppPalette.textSecondary),
+      labelStyle: const TextStyle(color: AppPalette.textSecondary),
+      prefixIconColor: AppPalette.textSecondary,
+      suffixIconColor: AppPalette.textSecondary,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppPalette.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppPalette.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppPalette.accent, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppPalette.error, width: 1.2),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: AppPalette.accent,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.3,
         ),
       ),
-    );
-  }
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppPalette.textPrimary,
+        side: const BorderSide(color: AppPalette.border),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(foregroundColor: AppPalette.accent),
+    ),
+    iconTheme: const IconThemeData(color: AppPalette.textSecondary),
+    dividerColor: AppPalette.border,
+    progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppPalette.accent),
+  );
 }

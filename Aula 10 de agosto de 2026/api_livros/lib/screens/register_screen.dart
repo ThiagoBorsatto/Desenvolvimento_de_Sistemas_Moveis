@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
-import '../theme/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -58,12 +57,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: GothicPalette.background,
-      appBar: AppBar(
-        backgroundColor: GothicPalette.background,
-        bottom: const GothicDivider(),
-      ),
+      appBar: AppBar(title: const Text('Criar conta')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -73,22 +70,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'CRIAR CONTA',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: GothicPalette.gold,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 3,
-                      fontFamily: 'serif',
-                    ),
-                  ),
-                  const SizedBox(height: 28),
                   TextFormField(
                     controller: _nameController,
-                    style: const TextStyle(color: GothicPalette.parchment),
-                    cursorColor: GothicPalette.gold,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: 'Nome',
@@ -100,8 +83,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _emailController,
-                    style: const TextStyle(color: GothicPalette.parchment),
-                    cursorColor: GothicPalette.gold,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
@@ -120,8 +101,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
-                    style: const TextStyle(color: GothicPalette.parchment),
-                    cursorColor: GothicPalette.gold,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
@@ -142,8 +121,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _confirmPasswordController,
-                    style: const TextStyle(color: GothicPalette.parchment),
-                    cursorColor: GothicPalette.gold,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _submit(),
@@ -163,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Text(
                       _errorMessage!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFE0889A)),
+                      style: TextStyle(color: theme.colorScheme.error),
                     ),
                   ],
                   const SizedBox(height: 28),
@@ -171,25 +148,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: _isSubmitting ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: GothicPalette.gold,
-                        foregroundColor: GothicPalette.background,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
                       child: _isSubmitting
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: GothicPalette.background,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text(
-                              'CRIAR CONTA',
-                              style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.w600),
-                            ),
+                          : const Text('Criar conta'),
                     ),
                   ),
                 ],

@@ -18,12 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Catálogo de Livros',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-        appBarTheme: gothicAppBarTheme,
-        inputDecorationTheme: gothicInputDecorationTheme,
-      ),
+      theme: buildAppTheme(),
       home: const AuthGate(),
     );
   }

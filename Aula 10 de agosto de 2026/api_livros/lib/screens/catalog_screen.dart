@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../services/auth_service.dart';
 import '../services/book_service.dart';
-import '../theme/app_theme.dart';
 import '../widgets/book_card.dart';
 import 'book_detail_screen.dart';
 
@@ -89,7 +88,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CATÁLOGO DE LIVROS'),
+        title: const Text('Catálogo de Livros'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -97,7 +96,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
             onPressed: () => AuthService().signOut(),
           ),
         ],
-        bottom: const GothicDivider(),
       ),
       body: Column(
         children: [
@@ -107,8 +105,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
               controller: _searchController,
               onChanged: _onSearchChanged,
               textInputAction: TextInputAction.search,
-              style: const TextStyle(color: GothicPalette.parchment),
-              cursorColor: GothicPalette.gold,
               decoration: InputDecoration(
                 hintText: 'Buscar por título ou autor',
                 prefixIcon: const Icon(Icons.search),

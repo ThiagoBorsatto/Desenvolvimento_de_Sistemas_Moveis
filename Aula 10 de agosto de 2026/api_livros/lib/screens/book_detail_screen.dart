@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../models/book.dart';
 import '../services/book_service.dart';
-import '../theme/app_theme.dart';
 
 class BookDetailScreen extends StatefulWidget {
   final Book book;
@@ -31,7 +30,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(book.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-        bottom: const GothicDivider(),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
