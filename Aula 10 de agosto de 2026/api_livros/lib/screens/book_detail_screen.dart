@@ -1,31 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../models/book.dart';
-import '../services/book_service.dart';
 
-class BookDetailScreen extends StatefulWidget {
+class BookDetailScreen extends StatelessWidget {
   final Book book;
 
   const BookDetailScreen({super.key, required this.book});
 
   @override
-  State<BookDetailScreen> createState() => _BookDetailScreenState();
-}
-
-class _BookDetailScreenState extends State<BookDetailScreen> {
-  final _service = BookService();
-  late final Future<String?> _descriptionFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _descriptionFuture = _service.fetchDescription(widget.book.workKey);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final book = widget.book;
-    final coverUrl = book.coverUrl(size: 'L');
+    final coverUrl = book.coverUrl;
 
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +20,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         children: [
           Center(
             child: Hero(
-              tag: book.workKey,
+              tag: book.id,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: SizedBox(
@@ -75,35 +59,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 ),
             textAlign: TextAlign.center,
           ),
-          if (book.firstPublishYear != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              'Publicado em ${book.firstPublishYear}',
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-          ],
           const SizedBox(height: 20),
           Text('Sinopse', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
-          FutureBuilder<String?>(
-            future: _descriptionFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              final description = snapshot.data;
-              if (description == null || description.isEmpty) {
-                return Text(
-                  'Sinopse não disponível para este livro.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                );
-              }
-              return Text(description, style: Theme.of(context).textTheme.bodyMedium);
-            },
+          Text(
+            book.description?.isNotEmpty == true
+                ? book.description!
+                : 'Sinopse não disponível para este livro.',
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           if (book.subjects.isNotEmpty) ...[
             const SizedBox(height: 20),

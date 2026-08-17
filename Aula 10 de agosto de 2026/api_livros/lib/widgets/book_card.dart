@@ -10,7 +10,7 @@ class BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coverUrl = book.coverUrl();
+    final coverUrl = book.coverUrl;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -21,7 +21,7 @@ class BookCard extends StatelessWidget {
           children: [
             Expanded(
               child: Hero(
-                tag: book.workKey,
+                tag: book.id,
                 child: coverUrl == null
                     ? _PlaceholderCover(title: book.title)
                     : Image.network(

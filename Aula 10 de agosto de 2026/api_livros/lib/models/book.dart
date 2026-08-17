@@ -1,30 +1,25 @@
-/// Representa um livro retornado pela Open Library API.
-///
-/// A API expõe os mesmos dados com nomes de campos diferentes conforme o
-/// endpoint (busca vs. lista por assunto), por isso o [fromJson] normaliza
-/// ambos os formatos.
+/// Representa um livro retornado pela Gutendex API (catálogo do Project
+/// Gutenberg).
 class Book {
-  final String workKey;
+  final int id;
   final String title;
   final List<String> authors;
-  final int? coverId;
-  final int? firstPublishYear;
+  final String? coverUrl;
   final List<String> subjects;
+  final String? description;
 
   const Book({
-    required this.workKey,
+    required this.id,
     required this.title,
     required this.authors,
-    required this.coverId,
-    required this.firstPublishYear,
+    required this.coverUrl,
     required this.subjects,
+    required this.description,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
     final authorsList = <String>[];
-    if (json['author_name'] is List) {
-      authorsList.addAll((json['author_name'] as List).whereType<String>());
-    } else if (json['authors'] is List) {
+    if (json['authors'] is List) {
       for (final author in json['authors'] as List) {
         if (author is Map && author['name'] is String) {
           authorsList.add(author['name'] as String);
@@ -32,20 +27,27 @@ class Book {
       }
     }
 
+    final formats = json['formats'] as Map<String, dynamic>? ?? {};
+    final summaries = json['summaries'] as List?;
+
     return Book(
-      workKey: json['key'] as String? ?? '',
+      id: json['id'] as int? ?? 0,
       title: json['title'] as String? ?? 'Título desconhecido',
       authors: authorsList,
-      coverId: (json['cover_i'] ?? json['cover_id']) as int?,
-      firstPublishYear: json['first_publish_year'] as int?,
-      subjects: (json['subject'] as List?)?.whereType<String>().toList() ?? const [],
+      coverUrl: _proxiedCoverUrl(formats['image/jpeg'] as String?),
+      subjects: (json['subjects'] as List?)?.whereType<String>().toList() ?? const [],
+      description: summaries != null && summaries.isNotEmpty ? summaries.first as String? : null,
     );
   }
 
   String get authorsLabel => authors.isEmpty ? 'Autor desconhecido' : authors.join(', ');
 
-  String? coverUrl({String size = 'M'}) {
-    if (coverId == null) return null;
-    return 'https://covers.openlibrary.org/b/id/$coverId-$size.jpg';
+  /// gutenberg.org não envia cabeçalhos CORS nas imagens de capa, então o
+  /// Flutter Web (renderer CanvasKit) bloqueia o download via fetch. O
+  /// images.weserv.nl reencaminha a mesma imagem já com CORS liberado.
+  static String? _proxiedCoverUrl(String? original) {
+    if (original == null) return null;
+    final withoutScheme = original.replaceFirst(RegExp(r'^https?://'), '');
+    return 'https://images.weserv.nl/?url=${Uri.encodeComponent(withoutScheme)}';
   }
 }

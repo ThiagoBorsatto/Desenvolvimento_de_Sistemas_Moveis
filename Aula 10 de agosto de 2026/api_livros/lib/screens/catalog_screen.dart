@@ -21,7 +21,7 @@ const _categories = [
   _Category('Romance', 'romance'),
   _Category('História', 'history'),
   _Category('Mistério', 'mystery'),
-  _Category('Infantil', 'juvenile_fiction'),
+  _Category('Infantil', 'children'),
 ];
 
 class CatalogScreen extends StatefulWidget {
@@ -81,7 +81,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ? _service.search(_activeQuery!)
           : _service.fetchBySubject(_selectedSubject);
     });
-    await _booksFuture;
+    await _booksFuture.catchError((_) => <Book>[]);
   }
 
   @override
