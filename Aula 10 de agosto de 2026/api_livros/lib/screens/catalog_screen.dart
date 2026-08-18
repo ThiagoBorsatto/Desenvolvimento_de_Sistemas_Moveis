@@ -153,7 +153,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   if (snapshot.hasError) {
                     return _MessageView(
                       icon: Icons.wifi_off,
-                      message: 'Não foi possível carregar os livros.\nVerifique sua conexão e tente novamente.',
+                      message:
+                          'Não foi possível carregar os livros.\nVerifique sua conexão e tente novamente.',
                       onRetry: _refresh,
                     );
                   }
@@ -166,19 +167,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   }
                   return GridView.builder(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.6,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.6,
+                        ),
                     itemCount: books.length,
                     itemBuilder: (context, index) {
                       final book = books[index];
                       return BookCard(
                         book: book,
                         onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => BookDetailScreen(book: book)),
+                          MaterialPageRoute(
+                            builder: (_) => BookDetailScreen(book: book),
+                          ),
                         ),
                       );
                     },
@@ -213,12 +217,19 @@ class _MessageView extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: 48, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  Icon(
+                    icon,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   const SizedBox(height: 12),
                   Text(message, textAlign: TextAlign.center),
                   if (onRetry != null) ...[
                     const SizedBox(height: 12),
-                    OutlinedButton(onPressed: onRetry, child: const Text('Tentar novamente')),
+                    OutlinedButton(
+                      onPressed: onRetry,
+                      child: const Text('Tentar novamente'),
+                    ),
                   ],
                 ],
               ),

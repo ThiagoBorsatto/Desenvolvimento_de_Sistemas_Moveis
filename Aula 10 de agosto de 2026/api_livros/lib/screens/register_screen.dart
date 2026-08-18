@@ -77,8 +77,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelText: 'Nome',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
-                    validator: (value) =>
-                        (value ?? '').trim().isEmpty ? 'Informe seu nome.' : null,
+                    validator: (value) => (value ?? '').trim().isEmpty
+                        ? 'Informe seu nome.'
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -107,8 +108,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelText: 'Senha',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -152,7 +159,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : const Text('Criar conta'),
                     ),
