@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart' show dotenv;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,21 +50,21 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBaljixmv_bjJmgpU8_7JChMDn885_3p9g',
-    appId: '1:358442254751:web:51250e9c3f430932d07daa',
-    messagingSenderId: '358442254751',
-    projectId: 'api-livros-catalogo-ec2a7',
-    authDomain: 'api-livros-catalogo-ec2a7.firebaseapp.com',
-    storageBucket: 'api-livros-catalogo-ec2a7.firebasestorage.app',
-    measurementId: 'G-2GCZDV1ZFS',
+  static FirebaseOptions get web => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_WEB_API_KEY']!,
+    appId: dotenv.env['FIREBASE_WEB_APP_ID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDv_m4YvfFRqBkpXGjVaMG85LpVHbxLOrU',
-    appId: '1:358442254751:android:f4213944b12601ecd07daa',
-    messagingSenderId: '358442254751',
-    projectId: 'api-livros-catalogo-ec2a7',
-    storageBucket: 'api-livros-catalogo-ec2a7.firebasestorage.app',
+  static FirebaseOptions get android => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY']!,
+    appId: dotenv.env['FIREBASE_ANDROID_APP_ID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
   );
 }
