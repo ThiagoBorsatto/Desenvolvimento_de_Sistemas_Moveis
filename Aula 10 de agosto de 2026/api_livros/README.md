@@ -58,6 +58,25 @@ cp android/app/google-services.json.example android/app/google-services.json
 
 Os dois arquivos estão no `.gitignore` — nunca commite nenhum deles.
 
+> **Sobre as chaves do Firebase:** elas são restritas por origem no Google
+> Cloud Console. A chave **web** só funciona a partir de `localhost`,
+> `127.0.0.1` e dos domínios do Firebase Hosting do projeto. A chave
+> **Android** só funciona para o pacote `com.example.api_livros` assinado com
+> o SHA-1 cadastrado.
+>
+> Isso significa que **buildar o app Android em outra máquina exige cadastrar
+> o SHA-1 do keystore de debug dela**. Para descobrir o seu:
+>
+> ```bash
+> keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android
+> ```
+>
+> E adicione em **Google Cloud Console > APIs e Serviços > Credenciais >
+> Android key > Restrições de aplicativo**. Sem isso o login falha com HTTP 403.
+>
+> As chaves são públicas por natureza (vão no bundle do app); a restrição é
+> o que impede que sejam usadas fora dele.
+
 ### 4. Rodar o app
 
 ```bash
