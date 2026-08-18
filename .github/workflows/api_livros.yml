@@ -65,9 +65,8 @@ jobs:
         run: |
           faltando=""
           while IFS= read -r chave; do
-            chave=$(echo "$chave" | tr -d '')
             [ -z "$chave" ] && continue
-            valor=$(grep "^${chave}=" .env | cut -d= -f2- | tr -d '')
+            valor=$(grep "^${chave}=" .env | cut -d= -f2-)
             [ -z "$valor" ] && faltando="${faltando} ${chave}"
           done < <(cut -d= -f1 .env.example)
           if [ -n "$faltando" ]; then
