@@ -28,18 +28,26 @@ class BookDetailScreen extends StatelessWidget {
                   height: 240,
                   child: coverUrl == null
                       ? Container(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
                           alignment: Alignment.center,
                           child: const Icon(Icons.menu_book_outlined, size: 48),
                         )
                       : Image.network(
                           coverUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.menu_book_outlined, size: 48),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.menu_book_outlined,
+                                  size: 48,
+                                ),
+                              ),
                         ),
                 ),
               ),
@@ -55,8 +63,8 @@ class BookDetailScreen extends StatelessWidget {
           Text(
             book.authorsLabel,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),

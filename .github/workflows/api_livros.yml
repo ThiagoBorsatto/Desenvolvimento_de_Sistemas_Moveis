@@ -1,0 +1,95 @@
+# CI do app api_livros.
+#
+# As chaves do Firebase nao ficam no repositorio: sao injetadas a partir dos
+# GitHub Secrets (Settings > Secrets and variables > Actions) e usadas para
+# remontar o .env em tempo de build. Esse e o padrao para segredo em CI:
+# o valor existe so na memoria do runner e some quando o job termina.
+name: CI api_livros
+
+on:
+  push:
+    branches: [main]
+    paths: ['Aula 10 de agosto de 2026/api_livros/**', '.github/workflows/api_livros.yml']
+  pull_request:
+    paths: ['Aula 10 de agosto de 2026/api_livros/**', '.github/workflows/api_livros.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'Aula 10 de agosto de 2026/api_livros'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+
+      - name: Instalar dependencias
+        run: flutter pub get
+
+      - name: Gerar .env a partir dos secrets
+        env:
+          FIREBASE_WEB_API_KEY: ${{ secrets.FIREBASE_WEB_API_KEY }}
+          FIREBASE_WEB_APP_ID: ${{ secrets.FIREBASE_WEB_APP_ID }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
+          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+        run: |
+          # Escrito via variaveis de ambiente, nunca interpolado direto no
+          # script: assim o valor nao vaza no log se o comando ecoar.
+          {
+            echo "FIREBASE_WEB_API_KEY=${FIREBASE_WEB_API_KEY}"
+            echo "FIREBASE_WEB_APP_ID=${FIREBASE_WEB_APP_ID}"
+            echo "FIREBASE_MESSAGING_SENDER_ID=${FIREBASE_MESSAGING_SENDER_ID}"
+            echo "FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}"
+            echo "FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN}"
+            echo "FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}"
+            echo "FIREBASE_MEASUREMENT_ID=${FIREBASE_MEASUREMENT_ID}"
+            echo "FIREBASE_ANDROID_API_KEY=${FIREBASE_ANDROID_API_KEY}"
+            echo "FIREBASE_ANDROID_APP_ID=${FIREBASE_ANDROID_APP_ID}"
+          } > .env
+
+      - name: Conferir se os secrets foram preenchidos
+        # O .env so e lido em runtime, entao o build passaria mesmo com os
+        # secrets vazios. Sem esta checagem a falha so apareceria no app.
+        run: |
+          faltando=""
+          while IFS= read -r chave; do
+            chave=$(echo "$chave" | tr -d '')
+            [ -z "$chave" ] && continue
+            valor=$(grep "^${chave}=" .env | cut -d= -f2- | tr -d '')
+            [ -z "$valor" ] && faltando="${faltando} ${chave}"
+          done < <(cut -d= -f1 .env.example)
+          if [ -n "$faltando" ]; then
+            echo "::error::Secrets ausentes no repositorio:${faltando}"
+            echo "Cadastre em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "Todos os secrets esperados estao preenchidos."
+
+      - name: Conferir formatacao
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analisar
+        run: flutter analyze
+
+      - name: Testar
+        run: flutter test
+
+      - name: Build web
+        run: flutter build web --release
+
+      - name: Remover o .env
+        # Garante que o .env nao sobra para passos seguintes nem para artefatos.
+        if: always()
+        run: rm -f .env

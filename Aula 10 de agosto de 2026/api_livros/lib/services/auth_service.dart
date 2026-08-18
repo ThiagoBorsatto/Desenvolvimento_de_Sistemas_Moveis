@@ -12,10 +12,17 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
 
   Future<void> signIn({required String email, required String password}) {
-    return _auth.signInWithEmailAndPassword(email: email.trim(), password: password);
+    return _auth.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
   }
 
-  Future<void> register({required String name, required String email, required String password}) async {
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email.trim(),
       password: password,

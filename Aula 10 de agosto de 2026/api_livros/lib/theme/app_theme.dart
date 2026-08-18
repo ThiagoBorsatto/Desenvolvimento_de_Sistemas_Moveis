@@ -18,21 +18,26 @@ class AppPalette {
 }
 
 ThemeData buildAppTheme() {
-  final colorScheme = ColorScheme.fromSeed(
-    seedColor: AppPalette.accent,
-    brightness: Brightness.dark,
-  ).copyWith(
-    surface: AppPalette.surface,
-    onSurface: AppPalette.textPrimary,
-    surfaceContainerHighest: AppPalette.surfaceElevated,
-    onSurfaceVariant: AppPalette.textSecondary,
-    outline: AppPalette.border,
-    error: AppPalette.error,
-  );
+  final colorScheme =
+      ColorScheme.fromSeed(
+        seedColor: AppPalette.accent,
+        brightness: Brightness.dark,
+      ).copyWith(
+        surface: AppPalette.surface,
+        onSurface: AppPalette.textPrimary,
+        surfaceContainerHighest: AppPalette.surfaceElevated,
+        onSurfaceVariant: AppPalette.textSecondary,
+        outline: AppPalette.border,
+        error: AppPalette.error,
+      );
 
-  final textTheme = GoogleFonts.manropeTextTheme(
-    ThemeData(brightness: Brightness.dark).textTheme,
-  ).apply(bodyColor: AppPalette.textPrimary, displayColor: AppPalette.textPrimary);
+  final textTheme =
+      GoogleFonts.manropeTextTheme(
+        ThemeData(brightness: Brightness.dark).textTheme,
+      ).apply(
+        bodyColor: AppPalette.textPrimary,
+        displayColor: AppPalette.textPrimary,
+      );
 
   return ThemeData(
     useMaterial3: true,
@@ -48,7 +53,9 @@ ThemeData buildAppTheme() {
       scrolledUnderElevation: 0,
       centerTitle: false,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+      titleTextStyle: textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w700,
+      ),
       iconTheme: const IconThemeData(color: AppPalette.textPrimary),
     ),
     cardTheme: CardThemeData(
@@ -121,6 +128,8 @@ ThemeData buildAppTheme() {
     ),
     iconTheme: const IconThemeData(color: AppPalette.textSecondary),
     dividerColor: AppPalette.border,
-    progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppPalette.accent),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color: AppPalette.accent,
+    ),
   );
 }

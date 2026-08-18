@@ -71,18 +71,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                     alignment: Alignment.center,
-                    child: const Icon(Icons.auto_stories_rounded, color: AppPalette.accent, size: 32),
+                    child: const Icon(
+                      Icons.auto_stories_rounded,
+                      color: AppPalette.accent,
+                      size: 32,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     'Catálogo de Livros',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Entre para acessar o acervo',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: AppPalette.textSecondary),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppPalette.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   TextFormField(
@@ -112,8 +120,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelText: 'Senha',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -138,7 +152,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : const Text('Entrar'),
                     ),
@@ -148,8 +165,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _isSubmitting
                         ? null
                         : () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const RegisterScreen(),
                             ),
+                          ),
                     child: const Text('Não tem conta? Criar conta'),
                   ),
                 ],

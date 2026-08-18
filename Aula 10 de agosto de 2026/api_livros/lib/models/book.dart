@@ -35,12 +35,16 @@ class Book {
       title: json['title'] as String? ?? 'Título desconhecido',
       authors: authorsList,
       coverUrl: _proxiedCoverUrl(formats['image/jpeg'] as String?),
-      subjects: (json['subjects'] as List?)?.whereType<String>().toList() ?? const [],
-      description: summaries != null && summaries.isNotEmpty ? summaries.first as String? : null,
+      subjects:
+          (json['subjects'] as List?)?.whereType<String>().toList() ?? const [],
+      description: summaries != null && summaries.isNotEmpty
+          ? summaries.first as String?
+          : null,
     );
   }
 
-  String get authorsLabel => authors.isEmpty ? 'Autor desconhecido' : authors.join(', ');
+  String get authorsLabel =>
+      authors.isEmpty ? 'Autor desconhecido' : authors.join(', ');
 
   /// gutenberg.org não envia cabeçalhos CORS nas imagens de capa, então o
   /// Flutter Web (renderer CanvasKit) bloqueia o download via fetch. O
