@@ -50,21 +50,34 @@ class DefaultFirebaseOptions {
     }
   }
 
+  /// Le uma variavel do .env, com erro explicito quando ela falta.
+  static String _env(String key) {
+    final value = dotenv.env[key];
+    if (value == null || value.isEmpty) {
+      throw StateError(
+        'Variavel $key nao encontrada no .env. '
+        'Copie o .env.example para .env e preencha os valores do Firebase '
+        '(veja o README, secao "Configurar o Firebase").',
+      );
+    }
+    return value;
+  }
+
   static FirebaseOptions get web => FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_WEB_API_KEY']!,
-    appId: dotenv.env['FIREBASE_WEB_APP_ID']!,
-    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
-    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
-    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
+    apiKey: _env('FIREBASE_WEB_API_KEY'),
+    appId: _env('FIREBASE_WEB_APP_ID'),
+    messagingSenderId: _env('FIREBASE_MESSAGING_SENDER_ID'),
+    projectId: _env('FIREBASE_PROJECT_ID'),
+    authDomain: _env('FIREBASE_AUTH_DOMAIN'),
+    storageBucket: _env('FIREBASE_STORAGE_BUCKET'),
+    measurementId: _env('FIREBASE_MEASUREMENT_ID'),
   );
 
   static FirebaseOptions get android => FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY']!,
-    appId: dotenv.env['FIREBASE_ANDROID_APP_ID']!,
-    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+    apiKey: _env('FIREBASE_ANDROID_API_KEY'),
+    appId: _env('FIREBASE_ANDROID_APP_ID'),
+    messagingSenderId: _env('FIREBASE_MESSAGING_SENDER_ID'),
+    projectId: _env('FIREBASE_PROJECT_ID'),
+    storageBucket: _env('FIREBASE_STORAGE_BUCKET'),
   );
 }

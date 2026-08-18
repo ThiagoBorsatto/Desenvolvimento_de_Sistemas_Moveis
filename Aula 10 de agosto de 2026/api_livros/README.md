@@ -21,11 +21,44 @@ Abra um terminal na pasta do projeto (`Aula 10 de agosto de 2026/api_livros`) e 
 flutter pub get
 ```
 
-### 3. Rodar o app
+### 3. Configurar o Firebase
 
-**Não é necessário configurar nada do Firebase manualmente** — os arquivos de
-configuração (`lib/firebase_options.dart` e `android/app/google-services.json`)
-já estão no repositório, prontos para uso.
+As chaves do Firebase **não ficam no repositório** (foram removidas por
+segurança). Antes de rodar, crie os dois arquivos de configuração locais:
+
+**a) O arquivo `.env`** — copie o modelo e preencha com as chaves do projeto:
+
+```bash
+cp .env.example .env    # no Windows/PowerShell: Copy-Item .env.example .env
+```
+
+Os valores estao no [Console do Firebase](https://console.firebase.google.com/)
+em **Configurações do projeto > Seus apps**, ou peça o `.env` pronto para o
+dono do repositório. O arquivo fica assim:
+
+```
+FIREBASE_WEB_API_KEY=AIza...
+FIREBASE_WEB_APP_ID=1:000000000000:web:...
+FIREBASE_MESSAGING_SENDER_ID=000000000000
+FIREBASE_PROJECT_ID=seu-projeto
+FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
+FIREBASE_STORAGE_BUCKET=seu-projeto.firebasestorage.app
+FIREBASE_MEASUREMENT_ID=G-...
+FIREBASE_ANDROID_API_KEY=AIza...
+FIREBASE_ANDROID_APP_ID=1:000000000000:android:...
+```
+
+**b) O arquivo `android/app/google-services.json`** (só precisa se for rodar no
+Android) — copie o modelo e substitua os `YOUR_...` pelos valores reais, ou
+baixe o arquivo direto do Console do Firebase:
+
+```bash
+cp android/app/google-services.json.example android/app/google-services.json
+```
+
+Os dois arquivos estão no `.gitignore` — nunca commite nenhum deles.
+
+### 4. Rodar o app
 
 ```bash
 flutter run
@@ -53,7 +86,7 @@ flutter build apk --release
 O `.apk` fica em `build/app/outputs/flutter-apk/app-release.apk` — é só
 transferir para o celular e instalar.
 
-### 4. Login
+### 5. Login
 
 O app pede login antes de mostrar o catálogo. Duas opções:
 
@@ -64,7 +97,7 @@ O app pede login antes de mostrar o catálogo. Duas opções:
   "Não tem conta? Criar conta" (nome, e-mail e senha — não precisa de nenhum
   cadastro externo).
 
-### 5. Rodar os testes (opcional)
+### 6. Rodar os testes (opcional)
 
 ```bash
 flutter test
