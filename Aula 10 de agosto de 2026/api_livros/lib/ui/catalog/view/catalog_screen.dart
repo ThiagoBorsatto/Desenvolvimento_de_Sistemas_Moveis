@@ -4,17 +4,21 @@ import '../../../data/repositories/auth_repository.dart';
 import '../../../data/repositories/book_repository.dart';
 import '../../../domain/models/book_category.dart';
 import '../../book_detail/view/book_detail_screen.dart';
+import '../../core/view_model/theme_view_model.dart';
 import '../../core/widgets/book_card.dart';
+import '../../core/widgets/theme_toggle_button.dart';
 import '../view_model/catalog_view_model.dart';
 
 class CatalogScreen extends StatefulWidget {
   final BookRepository bookRepository;
   final AuthRepository authRepository;
+  final ThemeViewModel themeViewModel;
 
   const CatalogScreen({
     super.key,
     required this.bookRepository,
     required this.authRepository,
+    required this.themeViewModel,
   });
 
   @override
@@ -49,6 +53,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       appBar: AppBar(
         title: const Text('Catálogo de Livros'),
         actions: [
+          ThemeToggleButton(viewModel: widget.themeViewModel),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',

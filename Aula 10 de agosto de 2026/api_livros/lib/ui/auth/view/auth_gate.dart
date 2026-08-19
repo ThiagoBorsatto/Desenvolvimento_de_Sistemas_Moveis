@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../data/repositories/auth_repository.dart';
 import '../../../data/repositories/book_repository.dart';
 import '../../catalog/view/catalog_screen.dart';
+import '../../core/view_model/theme_view_model.dart';
 import 'login_screen.dart';
 
 /// Mostra o catálogo quando há um usuário autenticado, ou a tela de login
@@ -14,11 +15,13 @@ import 'login_screen.dart';
 class AuthGate extends StatelessWidget {
   final AuthRepository authRepository;
   final BookRepository bookRepository;
+  final ThemeViewModel themeViewModel;
 
   const AuthGate({
     super.key,
     required this.authRepository,
     required this.bookRepository,
+    required this.themeViewModel,
   });
 
   @override
@@ -35,9 +38,13 @@ class AuthGate extends StatelessWidget {
           return CatalogScreen(
             bookRepository: bookRepository,
             authRepository: authRepository,
+            themeViewModel: themeViewModel,
           );
         }
-        return LoginScreen(authRepository: authRepository);
+        return LoginScreen(
+          authRepository: authRepository,
+          themeViewModel: themeViewModel,
+        );
       },
     );
   }

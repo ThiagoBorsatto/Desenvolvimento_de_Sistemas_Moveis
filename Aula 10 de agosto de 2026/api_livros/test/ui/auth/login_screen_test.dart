@@ -1,5 +1,7 @@
 import 'package:api_livros/data/repositories/auth_repository.dart';
+import 'package:api_livros/data/repositories/theme_repository.dart';
 import 'package:api_livros/ui/auth/view/login_screen.dart';
+import 'package:api_livros/ui/core/view_model/theme_view_model.dart';
 import 'package:api_livros/utils/result.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,13 +41,31 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> signOut() async {}
 }
 
+class _FakeThemeRepository implements ThemeRepository {
+  ThemeMode stored = ThemeMode.system;
+
+  @override
+  ThemeMode load() => stored;
+
+  @override
+  Future<void> save(ThemeMode mode) async => stored = mode;
+}
+
 void main() {
   late _FakeAuthRepository authRepository;
+  late ThemeViewModel themeViewModel;
 
-  setUp(() => authRepository = _FakeAuthRepository());
+  setUp(() {
+    authRepository = _FakeAuthRepository();
+    themeViewModel = ThemeViewModel(_FakeThemeRepository());
+  });
 
-  Widget buildSubject() =>
-      MaterialApp(home: LoginScreen(authRepository: authRepository));
+  Widget buildSubject() => MaterialApp(
+    home: LoginScreen(
+      authRepository: authRepository,
+      themeViewModel: themeViewModel,
+    ),
+  );
 
   testWidgets('exibe os campos de e-mail e senha', (tester) async {
     await tester.pumpWidget(buildSubject());
@@ -109,5 +129,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('E-mail ou senha incorretos.'), findsOneWidget);
+  });
+
+  testWidgets('o botão de tema alterna a preferência', (tester) async {
+    await tester.pumpWidget(buildSubject());
+
+    // O MaterialApp de teste está no tema claro, então o botão oferece o
+    // escuro (ícone de lua).
+    await tester.tap(find.byIcon(Icons.dark_mode_outlined));
+    await tester.pumpAndSettle();
+
+    expect(themeViewModel.themeMode, ThemeMode.dark);
   });
 }
