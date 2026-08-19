@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Camada fina sobre o Firebase Authentication (email/senha).
+///
+/// Repassa as chamadas do SDK sem interpretá-las: a tradução de erros e a
+/// exposição para a UI ficam no [AuthRepository].
 class AuthService {
   // Getter (não `final` avaliado no construtor) para que instanciar
   // AuthService não exija Firebase.initializeApp() já ter rodado —
@@ -33,32 +36,4 @@ class AuthService {
   }
 
   Future<void> signOut() => _auth.signOut();
-
-  /// Traduz erros do Firebase Auth para mensagens amigáveis em português.
-  String friendlyError(Object error) {
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'invalid-email':
-          return 'E-mail inválido.';
-        case 'user-disabled':
-          return 'Esta conta foi desativada.';
-        case 'user-not-found':
-          return 'Nenhuma conta encontrada com esse e-mail.';
-        case 'wrong-password':
-        case 'invalid-credential':
-          return 'E-mail ou senha incorretos.';
-        case 'email-already-in-use':
-          return 'Já existe uma conta com esse e-mail.';
-        case 'weak-password':
-          return 'A senha precisa ter pelo menos 6 caracteres.';
-        case 'too-many-requests':
-          return 'Muitas tentativas. Tente novamente em instantes.';
-        case 'network-request-failed':
-          return 'Falha de conexão. Verifique sua internet.';
-        default:
-          return 'Não foi possível concluir. Tente novamente.';
-      }
-    }
-    return 'Ocorreu um erro inesperado.';
-  }
 }

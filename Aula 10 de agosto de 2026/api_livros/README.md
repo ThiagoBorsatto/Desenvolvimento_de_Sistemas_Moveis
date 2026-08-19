@@ -1,9 +1,24 @@
 # Catálogo de Livros
 
 App Flutter de catálogo de livros, com foco em telas pequenas (mobile). Os
-dados vêm da [Open Library API](https://openlibrary.org/dev/docs/api) (busca,
-categorias e capas) e o acesso ao app é protegido por login com **Firebase
-Authentication** (e-mail/senha).
+dados vêm da [Gutendex API](https://gutendex.com) (catálogo do Project
+Gutenberg: busca, assuntos e capas) e o acesso ao app é protegido por login com
+**Firebase Authentication** (e-mail/senha).
+
+## Funcionalidades
+
+- **Acervo completo na abertura.** A tela inicial mostra os livros todos
+  juntos, ordenados por popularidade, sem nenhum filtro aplicado. As categorias
+  só entram em cena quando o usuário toca em um chip.
+- **Filtro por categoria.** Chips horizontais (Ficção, Fantasia, Romance,
+  História, Mistério, Infantil, Poesia, Aventura) com um chip "Todos" para
+  voltar ao acervo inteiro.
+- **Busca na barra superior.** O ícone de lupa transforma a barra em campo de
+  busca. Procura por título, nome do autor e também por assuntos/estantes do
+  livro; combina com a categoria selecionada, se houver.
+- **Tema claro e escuro.** Botão de alternância à direita da barra superior
+  (e no canto da tela de login). A escolha é salva no dispositivo e vale para
+  as próximas aberturas; sem escolha, o app segue o tema do sistema.
 
 ## Como rodar depois de clonar
 
@@ -123,22 +138,63 @@ flutter test
 flutter analyze
 ```
 
-## Estrutura do projeto
+## Arquitetura
+
+O projeto segue **MVVM**, a arquitetura recomendada pela documentação oficial
+do Flutter ([Guide to app architecture](https://docs.flutter.dev/app-architecture)),
+organizada por funcionalidade (*feature-first*).
+
+São três camadas, e a dependência só aponta para baixo — a UI conhece o
+repositório, o repositório conhece o service, e nunca o contrário:
+
+| Camada | Papel | Não pode |
+| --- | --- | --- |
+| **UI** (`ui/`) | *View* desenha; *ViewModel* guarda o estado da tela e as regras de interação. | Falar HTTP, conhecer `FirebaseAuthException`. |
+| **Data** (`data/`) | *Repository* decide o que buscar, faz cache e traduz erros em mensagens. *Service* fala com uma fonte externa. | Conhecer widgets. |
+| **Domain** (`domain/`) | Modelos puros compartilhados pelas outras camadas. | Depender de qualquer outra camada. |
+
+Decisões que valem destacar:
+
+- **Repositórios são interfaces.** `BookRepository`, `AuthRepository` e
+  `ThemeRepository` são abstratos; as implementações concretas
+  (`BookRepositoryRemote`, `AuthRepositoryFirebase`, `ThemeRepositoryLocal`)
+  são escolhidas uma única vez, no `main.dart`. É o que permite testar as
+  telas e as ViewModels com dublês, sem rede e sem Firebase.
+- **Injeção manual por construtor.** Não há container de DI nem `provider`: as
+  dependências são criadas no `main.dart` (*composition root*) e descem pela
+  árvore de widgets. Menos mágica, e o caminho fica explícito.
+- **`Result<T>` na fronteira.** Repositórios devolvem `Ok` ou `Failure` em vez
+  de lançar exceção. O `switch` sobre a *sealed class* obriga a tratar os dois
+  casos, e a mensagem de erro já chega pronta em português — a tela não precisa
+  adivinhar o que deu errado.
+- **Estado com `ChangeNotifier` + `ListenableBuilder`,** ambos do próprio
+  Flutter, sem pacote de gerência de estado.
 
 ```
 lib/
-├── main.dart                    # inicializa o Firebase e monta o app
-├── firebase_options.dart        # configuração do Firebase (gerada, não editar à mão)
-├── models/book.dart             # modelo de dados do livro
-├── services/
-│   ├── auth_service.dart        # login/cadastro/logout (Firebase Auth)
-│   └── book_service.dart        # busca de livros na Open Library API
-├── screens/
-│   ├── auth_gate.dart           # decide entre tela de login e catálogo
-│   ├── login_screen.dart
-│   ├── register_screen.dart
-│   ├── catalog_screen.dart      # busca + grid de livros
-│   └── book_detail_screen.dart
-├── widgets/book_card.dart
-└── theme/app_theme.dart         # paleta e estilo "dark-gothic" do app
+├── main.dart                       # composition root: cria e injeta as dependências
+├── firebase_options.dart           # configuração do Firebase (gerada, não editar à mão)
+├── domain/models/
+│   ├── book.dart                   # modelo de livro
+│   └── book_category.dart          # categorias oferecidas como filtro
+├── data/
+│   ├── services/
+│   │   ├── book_api_service.dart   # cliente HTTP da Gutendex
+│   │   ├── auth_service.dart       # camada fina sobre o Firebase Auth
+│   │   └── theme_preference_service.dart
+│   └── repositories/
+│       ├── book_repository.dart    # busca + filtro + cache em memória
+│       ├── auth_repository.dart    # login/cadastro/logout, erros traduzidos
+│       └── theme_repository.dart
+├── ui/
+│   ├── core/
+│   │   ├── themes/app_theme.dart   # paletas clara e escura
+│   │   ├── view_model/theme_view_model.dart
+│   │   └── widgets/                # book_card.dart, theme_toggle_button.dart
+│   ├── auth/{view,view_model}/     # auth_gate, login, cadastro
+│   ├── catalog/{view,view_model}/  # barra de busca, filtros e grid
+│   └── book_detail/view/
+└── utils/result.dart               # Ok / Failure
 ```
+
+Os testes espelham essa estrutura em `test/ui/...`.
