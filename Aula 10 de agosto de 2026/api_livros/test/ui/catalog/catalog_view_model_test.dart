@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// interface e a ViewModel a recebe pelo construtor.
 class _FakeBookRepository implements BookRepository {
   final List<BookCategory?> catalogCalls = [];
-  final List<String> searchCalls = [];
+  final List<({String query, BookCategory? category})> searchCalls = [];
 
   List<Book> booksToReturn = const [];
   String? failureMessage;
@@ -27,9 +27,10 @@ class _FakeBookRepository implements BookRepository {
   @override
   Future<Result<List<Book>>> search({
     required String query,
+    BookCategory? category,
     bool forceRefresh = false,
   }) async {
-    searchCalls.add(query);
+    searchCalls.add((query: query, category: category));
     return _result();
   }
 
@@ -46,7 +47,9 @@ Book _book(int id, String title) => Book(
   authors: const ['Autor'],
   coverUrl: null,
   subjects: const [],
+  languages: const ['en'],
   description: null,
+  downloadCount: 0,
 );
 
 void main() {
@@ -95,13 +98,19 @@ void main() {
     expect(repository.catalogCalls, [null, BookCategory.history, null]);
   });
 
-  test('busca envia o termo sem espaços em volta', () async {
+  test('busca envia o termo e a categoria ativa', () async {
+    await viewModel.load();
+    viewModel.selectCategory(BookCategory.romance);
+    await Future<void>.delayed(Duration.zero);
+
     viewModel.submitQuery('  machado  ');
     await Future<void>.delayed(Duration.zero);
 
     expect(viewModel.isSearching, isTrue);
     expect(viewModel.query, 'machado');
-    expect(repository.searchCalls, ['machado']);
+    expect(repository.searchCalls, [
+      (query: 'machado', category: BookCategory.romance),
+    ]);
   });
 
   test('limpar a busca volta para o catálogo', () async {

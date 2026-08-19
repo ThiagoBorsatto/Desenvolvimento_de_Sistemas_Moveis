@@ -6,7 +6,12 @@ class Book {
   final List<String> authors;
   final String? coverUrl;
   final List<String> subjects;
+  final List<String> languages;
   final String? description;
+
+  /// Número de downloads no Project Gutenberg. Serve como proxy de
+  /// popularidade para ordenar resultados de busca vindos de fontes diferentes.
+  final int downloadCount;
 
   const Book({
     required this.id,
@@ -14,7 +19,9 @@ class Book {
     required this.authors,
     required this.coverUrl,
     required this.subjects,
+    required this.languages,
     required this.description,
+    required this.downloadCount,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -37,9 +44,13 @@ class Book {
       coverUrl: _proxiedCoverUrl(formats['image/jpeg'] as String?),
       subjects:
           (json['subjects'] as List?)?.whereType<String>().toList() ?? const [],
+      languages:
+          (json['languages'] as List?)?.whereType<String>().toList() ??
+          const [],
       description: summaries != null && summaries.isNotEmpty
           ? summaries.first as String?
           : null,
+      downloadCount: json['download_count'] as int? ?? 0,
     );
   }
 

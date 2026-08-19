@@ -15,9 +15,11 @@ abstract class BookRepository {
     bool forceRefresh = false,
   });
 
-  /// Busca livre por título ou nome do autor.
+  /// Busca livre. Casa contra título, nome do autor e — quando nenhuma
+  /// categoria está selecionada — também contra assuntos e estantes do livro.
   Future<Result<List<Book>>> search({
     required String query,
+    BookCategory? category,
     bool forceRefresh = false,
   });
 }
@@ -47,14 +49,47 @@ class BookRepositoryRemote implements BookRepository {
   @override
   Future<Result<List<Book>>> search({
     required String query,
+    BookCategory? category,
     bool forceRefresh = false,
   }) {
     final term = query.trim();
+    if (term.isEmpty) {
+      return loadCatalog(category: category, forceRefresh: forceRefresh);
+    }
+
     return _guard(
-      cacheKey: 'search:$term',
+      cacheKey: 'search:$term:${category?.topic ?? 'all'}',
       forceRefresh: forceRefresh,
-      request: () => _api.fetchBooks(search: term),
+      request: () => _searchBooks(term, category),
     );
+  }
+
+  /// A Gutendex separa a busca em dois parâmetros: `search` cobre título e
+  /// autor, `topic` cobre assuntos e estantes. Para o usuário isso é uma coisa
+  /// só ("procurar por qualquer atributo"), então sem categoria selecionada
+  /// disparamos as duas consultas em paralelo e unimos os resultados.
+  ///
+  /// Com uma categoria ativa o `topic` já está ocupado pelo filtro, então a
+  /// busca fica restrita a título e autor dentro daquela categoria.
+  Future<List<Book>> _searchBooks(String term, BookCategory? category) async {
+    if (category != null) {
+      return _api.fetchBooks(search: term, topic: category.topic);
+    }
+
+    final responses = await Future.wait([
+      _api.fetchBooks(search: term),
+      _api.fetchBooks(topic: term),
+    ]);
+
+    final merged = <int, Book>{};
+    for (final books in responses) {
+      for (final book in books) {
+        merged.putIfAbsent(book.id, () => book);
+      }
+    }
+    final result = merged.values.toList()
+      ..sort((a, b) => b.downloadCount.compareTo(a.downloadCount));
+    return result;
   }
 
   /// Executa [request] respeitando o cache e converte qualquer exceção da

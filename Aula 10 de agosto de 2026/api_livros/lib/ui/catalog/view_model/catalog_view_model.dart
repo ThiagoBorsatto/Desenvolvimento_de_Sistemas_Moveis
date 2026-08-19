@@ -9,12 +9,12 @@ import '../../../utils/result.dart';
 
 /// Estado e regras da tela de catálogo.
 ///
-/// Concentra tudo que não é desenho: qual categoria está ativa, o termo de
-/// busca, o debounce do teclado, o descarte de respostas obsoletas e a
-/// mensagem de erro. A view só lê estes getters e chama estes métodos.
+/// Concentra tudo que não é desenho: qual filtro está ativo, o termo de busca,
+/// o debounce do teclado, o descarte de respostas obsoletas e a mensagem de
+/// erro. A view só lê estes getters e chama estes métodos.
 class CatalogViewModel extends ChangeNotifier {
   /// Espera antes de disparar a busca, para não fazer uma requisição por tecla.
-  static const debounceDuration = Duration(milliseconds: 500);
+  static const debounceDuration = Duration(milliseconds: 450);
 
   final BookRepository _repository;
 
@@ -46,17 +46,15 @@ class CatalogViewModel extends ChangeNotifier {
   bool get isSearching => _query.isNotEmpty;
   bool get hasActiveFilter => _selectedCategory != null;
 
+  /// Carregamento inicial: acervo completo, sem nenhum filtro aplicado.
   Future<void> load() => _fetch();
 
   Future<void> refresh() => _fetch(forceRefresh: true);
 
-  /// [category] nulo volta para o acervo completo (chip "Todos"). Trocar de
-  /// categoria encerra a busca em andamento.
+  /// [category] nulo volta para o acervo completo (chip "Todos").
   void selectCategory(BookCategory? category) {
-    if (category == _selectedCategory && _query.isEmpty) return;
+    if (category == _selectedCategory) return;
     _selectedCategory = category;
-    _query = '';
-    _debounce?.cancel();
     notifyListeners();
     _fetch();
   }
@@ -92,7 +90,11 @@ class CatalogViewModel extends ChangeNotifier {
             category: _selectedCategory,
             forceRefresh: forceRefresh,
           )
-        : await _repository.search(query: _query, forceRefresh: forceRefresh);
+        : await _repository.search(
+            query: _query,
+            category: _selectedCategory,
+            forceRefresh: forceRefresh,
+          );
 
     // Outra requisição começou depois desta: o resultado aqui já não vale.
     if (requestId != _requestId) return;

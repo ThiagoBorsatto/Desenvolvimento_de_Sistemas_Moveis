@@ -9,6 +9,8 @@ import '../../core/widgets/book_card.dart';
 import '../../core/widgets/theme_toggle_button.dart';
 import '../view_model/catalog_view_model.dart';
 
+/// Tela principal: acervo completo por padrão, com filtro por categoria e
+/// busca opcionais.
 class CatalogScreen extends StatefulWidget {
   final BookRepository bookRepository;
   final AuthRepository authRepository;
@@ -29,6 +31,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
   late final CatalogViewModel _viewModel;
   final _searchController = TextEditingController();
 
+  /// Controla se a barra superior está no modo busca (campo de texto) ou no
+  /// modo normal (título + ícone de lupa).
+  bool _isSearchOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,56 +48,30 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.dispose();
   }
 
-  void _selectCategory(BookCategory? category) {
+  void _openSearch() => setState(() => _isSearchOpen = true);
+
+  void _closeSearch() {
+    setState(() => _isSearchOpen = false);
     _searchController.clear();
-    _viewModel.selectCategory(category);
+    _viewModel.clearSearch();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Catálogo de Livros'),
-        actions: [
-          ThemeToggleButton(viewModel: widget.themeViewModel),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sair',
-            onPressed: () => widget.authRepository.signOut(),
-          ),
-        ],
-      ),
+      appBar: _isSearchOpen ? _buildSearchAppBar() : _buildDefaultAppBar(),
       body: ListenableBuilder(
         listenable: _viewModel,
         builder: (context, _) => Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _viewModel.onQueryChanged,
-                onSubmitted: _viewModel.submitQuery,
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                  hintText: 'Buscar por título ou autor',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            _viewModel.clearSearch();
-                          },
-                        ),
-                  isDense: true,
-                ),
-              ),
+            _CategoryFilterBar(
+              selected: _viewModel.selectedCategory,
+              onSelected: _viewModel.selectCategory,
             ),
-            if (!_viewModel.isSearching)
-              _CategoryFilterBar(
-                selected: _viewModel.selectedCategory,
-                onSelected: _selectCategory,
+            if (_viewModel.isSearching && !_viewModel.isLoading)
+              _ResultSummary(
+                query: _viewModel.query,
+                count: _viewModel.books.length,
               ),
             const SizedBox(height: 8),
             Expanded(
@@ -103,6 +83,69 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  PreferredSizeWidget _buildDefaultAppBar() {
+    return AppBar(
+      title: const Text('Catálogo de Livros'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.search),
+          tooltip: 'Buscar livros',
+          onPressed: _openSearch,
+        ),
+        ThemeToggleButton(viewModel: widget.themeViewModel),
+        IconButton(
+          icon: const Icon(Icons.logout),
+          tooltip: 'Sair',
+          onPressed: () => widget.authRepository.signOut(),
+        ),
+      ],
+    );
+  }
+
+  PreferredSizeWidget _buildSearchAppBar() {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Fechar busca',
+        onPressed: _closeSearch,
+      ),
+      titleSpacing: 0,
+      title: TextField(
+        controller: _searchController,
+        autofocus: true,
+        textInputAction: TextInputAction.search,
+        onChanged: _viewModel.onQueryChanged,
+        onSubmitted: _viewModel.submitQuery,
+        decoration: const InputDecoration(
+          hintText: 'Título, autor ou assunto',
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          filled: false,
+          isDense: true,
+        ),
+      ),
+      actions: [
+        // Reconstrói só este botão conforme o texto muda, para o "limpar"
+        // aparecer e sumir sem um setState na tela inteira.
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _searchController,
+          builder: (context, value, _) => value.text.isEmpty
+              ? const SizedBox.shrink()
+              : IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: 'Limpar busca',
+                  onPressed: () {
+                    _searchController.clear();
+                    _viewModel.clearSearch();
+                  },
+                ),
+        ),
+        ThemeToggleButton(viewModel: widget.themeViewModel),
+      ],
     );
   }
 
@@ -122,9 +165,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
     final books = _viewModel.books;
     if (books.isEmpty) {
-      return const _MessageView(
+      return _MessageView(
         icon: Icons.search_off,
-        message: 'Nenhum livro encontrado.',
+        message: _viewModel.isSearching
+            ? 'Nenhum livro encontrado para "${_viewModel.query}".'
+            : 'Nenhum livro encontrado.',
       );
     }
 
@@ -187,6 +232,32 @@ class _CategoryFilterBar extends StatelessWidget {
                 onSelected(isSelected ? category : null),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Linha de resumo exibida durante uma busca ("N resultados para …").
+class _ResultSummary extends StatelessWidget {
+  final String query;
+  final int count;
+
+  const _ResultSummary({required this.query, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = count == 1 ? '1 resultado' : '$count resultados';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          '$label para "$query"',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
       ),
     );
   }
