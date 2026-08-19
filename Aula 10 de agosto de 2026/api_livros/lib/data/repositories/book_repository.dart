@@ -8,9 +8,10 @@ import '../services/book_api_service.dart';
 /// É uma interface, e não uma classe concreta, para que os testes possam
 /// injetar uma implementação falsa sem tocar na rede.
 abstract class BookRepository {
-  /// Livros de uma categoria.
+  /// Catálogo da tela inicial. Com [category] nulo devolve o acervo inteiro
+  /// (nenhum filtro aplicado), que é o estado padrão da tela.
   Future<Result<List<Book>>> loadCatalog({
-    required BookCategory category,
+    BookCategory? category,
     bool forceRefresh = false,
   });
 
@@ -33,13 +34,13 @@ class BookRepositoryRemote implements BookRepository {
 
   @override
   Future<Result<List<Book>>> loadCatalog({
-    required BookCategory category,
+    BookCategory? category,
     bool forceRefresh = false,
   }) {
     return _guard(
-      cacheKey: 'catalog:${category.topic}',
+      cacheKey: 'catalog:${category?.topic ?? 'all'}',
       forceRefresh: forceRefresh,
-      request: () => _api.fetchBooks(topic: category.topic),
+      request: () => _api.fetchBooks(topic: category?.topic),
     );
   }
 

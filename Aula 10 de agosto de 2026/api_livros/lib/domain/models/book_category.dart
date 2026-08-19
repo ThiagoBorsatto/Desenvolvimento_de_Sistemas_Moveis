@@ -1,11 +1,16 @@
 /// Categorias oferecidas como filtro no catálogo.
+///
+/// Não existe um valor "Todos": ausência de filtro é representada por
+/// `BookCategory?` nulo, que é o estado inicial da tela.
 enum BookCategory {
   fiction('Ficção', 'fiction'),
   fantasy('Fantasia', 'fantasy'),
   romance('Romance', 'romance'),
   history('História', 'history'),
   mystery('Mistério', 'mystery'),
-  children('Infantil', 'children');
+  children('Infantil', 'children'),
+  poetry('Poesia', 'poetry'),
+  adventure('Aventura', 'adventure');
 
   const BookCategory(this.label, this.topic);
 

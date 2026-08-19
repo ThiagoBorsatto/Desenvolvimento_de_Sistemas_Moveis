@@ -42,7 +42,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.dispose();
   }
 
-  void _selectCategory(BookCategory category) {
+  void _selectCategory(BookCategory? category) {
     _searchController.clear();
     _viewModel.selectCategory(category);
   }
@@ -151,9 +151,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
 }
 
 /// Faixa horizontal de chips de categoria.
+///
+/// O primeiro chip é "Todos" e vem selecionado na abertura do app: o acervo
+/// aparece inteiro e só se separa por categoria quando o usuário escolhe uma.
 class _CategoryFilterBar extends StatelessWidget {
-  final BookCategory selected;
-  final ValueChanged<BookCategory> onSelected;
+  final BookCategory? selected;
+  final ValueChanged<BookCategory?> onSelected;
 
   const _CategoryFilterBar({required this.selected, required this.onSelected});
 
@@ -164,14 +167,24 @@ class _CategoryFilterBar extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        itemCount: BookCategory.values.length,
+        // +1 pelo chip "Todos", que não é um valor do enum.
+        itemCount: BookCategory.values.length + 1,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final category = BookCategory.values[index];
+          if (index == 0) {
+            return ChoiceChip(
+              label: const Text('Todos'),
+              selected: selected == null,
+              onSelected: (_) => onSelected(null),
+            );
+          }
+
+          final category = BookCategory.values[index - 1];
           return ChoiceChip(
             label: Text(category.label),
             selected: category == selected,
-            onSelected: (_) => onSelected(category),
+            onSelected: (isSelected) =>
+                onSelected(isSelected ? category : null),
           );
         },
       ),

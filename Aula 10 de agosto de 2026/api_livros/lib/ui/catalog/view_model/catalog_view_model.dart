@@ -24,7 +24,11 @@ class CatalogViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String _query = '';
-  BookCategory _selectedCategory = BookCategory.fiction;
+
+  /// Nulo significa "sem filtro": é o estado inicial da tela, em que o acervo
+  /// aparece inteiro, sem separação por categoria. As categorias só entram em
+  /// cena quando o usuário toca em um chip.
+  BookCategory? _selectedCategory;
 
   Timer? _debounce;
 
@@ -38,15 +42,17 @@ class CatalogViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String get query => _query;
-  BookCategory get selectedCategory => _selectedCategory;
+  BookCategory? get selectedCategory => _selectedCategory;
   bool get isSearching => _query.isNotEmpty;
+  bool get hasActiveFilter => _selectedCategory != null;
 
   Future<void> load() => _fetch();
 
   Future<void> refresh() => _fetch(forceRefresh: true);
 
-  /// Trocar de categoria encerra a busca em andamento.
-  void selectCategory(BookCategory category) {
+  /// [category] nulo volta para o acervo completo (chip "Todos"). Trocar de
+  /// categoria encerra a busca em andamento.
+  void selectCategory(BookCategory? category) {
     if (category == _selectedCategory && _query.isEmpty) return;
     _selectedCategory = category;
     _query = '';

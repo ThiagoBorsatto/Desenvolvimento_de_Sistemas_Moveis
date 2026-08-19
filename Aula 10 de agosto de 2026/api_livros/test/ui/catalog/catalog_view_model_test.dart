@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// mandar, sem tocar na rede. Só é possível porque [BookRepository] é uma
 /// interface e a ViewModel a recebe pelo construtor.
 class _FakeBookRepository implements BookRepository {
-  final List<BookCategory> catalogCalls = [];
+  final List<BookCategory?> catalogCalls = [];
   final List<String> searchCalls = [];
 
   List<Book> booksToReturn = const [];
@@ -17,7 +17,7 @@ class _FakeBookRepository implements BookRepository {
 
   @override
   Future<Result<List<Book>>> loadCatalog({
-    required BookCategory category,
+    BookCategory? category,
     bool forceRefresh = false,
   }) async {
     catalogCalls.add(category);
@@ -60,26 +60,39 @@ void main() {
 
   tearDown(() => viewModel.dispose());
 
-  test('carrega a categoria inicial', () async {
+  test('começa sem filtro e carrega o acervo completo', () async {
     repository.booksToReturn = [_book(1, 'Dom Casmurro')];
+
+    expect(viewModel.selectedCategory, isNull);
+    expect(viewModel.hasActiveFilter, isFalse);
 
     await viewModel.load();
 
-    expect(repository.catalogCalls, [BookCategory.fiction]);
+    // Categoria nula = nenhum filtro enviado para a API.
+    expect(repository.catalogCalls, [null]);
     expect(viewModel.books, hasLength(1));
     expect(viewModel.isLoading, isFalse);
   });
 
-  test('selecionar uma categoria recarrega o catálogo', () async {
+  test('selecionar uma categoria passa a filtrar o acervo', () async {
     await viewModel.load();
     viewModel.selectCategory(BookCategory.fantasy);
     await Future<void>.delayed(Duration.zero);
 
     expect(viewModel.selectedCategory, BookCategory.fantasy);
-    expect(repository.catalogCalls, [
-      BookCategory.fiction,
-      BookCategory.fantasy,
-    ]);
+    expect(viewModel.hasActiveFilter, isTrue);
+    expect(repository.catalogCalls, [null, BookCategory.fantasy]);
+  });
+
+  test('voltar para "Todos" remove o filtro', () async {
+    await viewModel.load();
+    viewModel.selectCategory(BookCategory.history);
+    await Future<void>.delayed(Duration.zero);
+    viewModel.selectCategory(null);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(viewModel.selectedCategory, isNull);
+    expect(repository.catalogCalls, [null, BookCategory.history, null]);
   });
 
   test('busca envia o termo sem espaços em volta', () async {
@@ -98,7 +111,7 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(viewModel.isSearching, isFalse);
-    expect(repository.catalogCalls, [BookCategory.fiction]);
+    expect(repository.catalogCalls, [null]);
   });
 
   test('falha do repositório vira mensagem de erro e lista vazia', () async {
